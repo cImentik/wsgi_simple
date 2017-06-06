@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Statistic page</title>
+</head>
+<body>
+<div style="padding: 5px">
+    <table>
+        <caption>Регионы с 5-ю и более комментариями</caption>
+        <tr>
+            <th>Регион</th>
+            <th>Коментрии</th>
+        </tr>
+        <tbody>
+            {% each rows %}
+            <tr>
+                {% if ..city %}
+                    <td>{{it.name}}</td>
+                {% else %}
+                    <td><a href="/stat/?rid={{it.id}}">{{it.name}}</a></td>
+                {% end %}
+                <td style="text-align: center">{{it.comments_count}}</td>
+            </tr>
+            {% end %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

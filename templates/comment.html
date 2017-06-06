@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Страница комментария</title>
+</head>
+<body>
+<h1>Добавте свой комментарий</h1>
+{% if warn %}
+    <div>
+        <p style="color: red">{{warn}}</p>
+    </div>
+{% end %}
+
+{% if success %}
+    <div>
+        <p style="color: green">{{success}}</p>
+    </div>
+{% end %}
+<div style="padding: 5px; text-align: center;">
+    <form name="comment_form" action="" method="POST">
+        <table>
+            <tr>
+                <td><label for="surname">Фамилия</label></td>
+                <td>            
+                    <input id="surname" type="text" name="surname" placeholder="Иванов" 
+                        value="{{comment.surname}}" required/>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="firstname">Имя</label></td>
+                <td>
+                    <input id="firstname" type="text" name="firstname" placeholder="Иван" 
+                        value="{{comment.firstname}}" required/>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="patronymic">Отчество</label></td>
+                <td>
+                    <input id="patronymic" type="text" name="patronymic" placeholder="Иванович" 
+                        value="{{comment.patronymic}}"/>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="region">Регион</label></td>
+                <td>
+                    <select id="region" name="region">
+                        <option selected disabled value="0">Выберите Регион</option>
+                        {% each regions %}
+                                <option value="{{it.id}}">{{it.name}}</option>
+                        {% end %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="city">Город</label></td>
+                <td>
+                    <select id="city" name="city">
+                        <option selected disabled value="0">Выберите Город</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="phone">Телефон</label></td>
+                <td>
+                    <input id="phone" type="text" name="phone" placeholder="(098) 7654321"
+                        value="{{comment.phone}}" pattern="^(\(\d+\))(\s)?\d+" />
+                </td>
+            </tr>
+            <tr>
+                <td><label for="email">E-mail</label></td>
+                <td>
+                    <input id="email" type="text" name="email" placeholder="box@email.me"
+                        value="{{comment.email}}" pattern="[^@\s]+@[^@\s]+\.[a-zA-Z0-9]+$" />
+                </td>
+            </tr>
+            <tr>
+                <td><label for="comment">Комментарий</label></td>
+                <td>
+                    <textarea id="comment" type="text" name="comment" placeholder="Текст комментария" required>{{comment.comment}}</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button type="submit">Комментировать</button>
+                </td>
+                <td>
+                    <button type="reset">Очистить</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+    <script type="text/javascript">
+        //Add listener to region selectbox onChange event
+        document.getElementById("region").addEventListener("change", function(){
+            var city = document.getElementById('city');
+            city.innerHTML=''; //clear <option>s
+
+            //Add top option
+            var city_head = new Option("Выберите город", "0", true, true);
+            city_head.disabled = true;
+            city.options[0] = city_head;
+
+            //Get ajax request and сhange city select
+            loadCities(this.options[this.selectedIndex].value, city);
+
+        });
+        function loadCities(region_id, select_city) {
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("POST", '/comment/', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+            xhr.onreadystatechange = function() {
+                if (this.readyState != 4) return;
+                var cities = JSON.parse(this.responseText);
+                //console.log(cities);
+                for(var i = 0; i < cities.length; i++){
+                    select_city.options[city.options.length] = new Option(cities[i].name,cities[i].id);
+                }
+            }
+
+            xhr.send('region_id=' + encodeURIComponent(region_id));
+        }
+    </script>
+</body>
+</html>
